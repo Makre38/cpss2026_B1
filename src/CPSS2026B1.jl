@@ -26,6 +26,7 @@ struct SimulationParameters
     coupling::Float64
     n_therm::Int
     n_measure::Int
+    snapshot_interval::Int
 end
 
 function parse_parameter_file(path::AbstractString)
@@ -51,6 +52,7 @@ function read_parameters(path::AbstractString)
     haskey(parameters, "J") || error("Could not find coupling J in $(path).")
     haskey(parameters, "n_therm") || error("Could not find n_therm in $(path).")
     haskey(parameters, "n_measure") || error("Could not find n_measure in $(path).")
+    haskey(parameters, "snapshot_interval") || error("Could not find snapshot_interval in $(path).")
 
     return SimulationParameters(
         parse(Int, parameters["L"]),
@@ -58,6 +60,7 @@ function read_parameters(path::AbstractString)
         parse(Float64, parameters["J"]),
         parse(Int, parameters["n_therm"]),
         parse(Int, parameters["n_measure"]),
+        parse(Int, parameters["snapshot_interval"]),
     )
 end
 

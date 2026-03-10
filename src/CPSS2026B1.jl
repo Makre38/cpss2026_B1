@@ -7,6 +7,8 @@ export AbstractBoundaryCondition,
     read_lattice_size,
     generate_lattice,
     generate_lattice_from_file,
+    local_field,
+    energy_change_for_flip,
     magnetization,
     energy
 
@@ -49,6 +51,36 @@ end
 
 function neighbor_index(index::Integer, size::Integer, ::PeriodicBoundary)
     return mod1(index, size)
+end
+
+function local_field(
+    lattice::AbstractMatrix{<:Integer},
+    row::Integer,
+    col::Integer;
+    boundary::AbstractBoundaryCondition = PeriodicBoundary(),
+)
+    nrows, ncols = size(lattice)
+    nrows == ncols || throw(ArgumentError("lattice must be square."))
+    1 <= row <= nrows || throw(BoundsError(lattice, (row, col)))
+    1 <= col <= ncols || throw(BoundsError(lattice, (row, col)))
+
+    row_minus = neighbor_index(row - 1, nrows, boundary)
+    row_plus = neighbor_index(row + 1, nrows, boundary)
+    col_minus = neighbor_index(col - 1, ncols, boundary)
+    col_plus = neighbor_index(col + 1, ncols, boundary)
+
+    return lattice[row_minus, col] + lattice[row_plus, col] + lattice[row, col_minus] + lattice[row, col_plus]
+end
+
+function energy_change_for_flip(
+    lattice::AbstractMatrix{<:Integer},
+    row::Integer,
+    col::Integer;
+    J::Real = 1,
+    boundary::AbstractBoundaryCondition = PeriodicBoundary(),
+)
+    spin = lattice[row, col]
+    return 2 * J * spin * local_field(lattice, row, col; boundary = boundary)
 end
 
 function energy(lattice::AbstractMatrix{<:Integer}; J::Real = 1, boundary::AbstractBoundaryCondition = PeriodicBoundary())

@@ -10,6 +10,7 @@ Manifest.toml
 # Build outputs
 build/
 dist/
+output/
 
 # Documentation and coverage
 docs/build/

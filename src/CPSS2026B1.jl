@@ -4,6 +4,8 @@ using Random
 
 export AbstractBoundaryCondition,
     PeriodicBoundary,
+    SimulationParameters,
+    read_parameters,
     read_lattice_size,
     generate_lattice,
     generate_lattice_from_file,
@@ -18,22 +20,43 @@ abstract type AbstractBoundaryCondition end
 
 struct PeriodicBoundary <: AbstractBoundaryCondition end
 
-function read_lattice_size(path::AbstractString)
+struct SimulationParameters
+    L::Int
+    temperature::Float64
+    coupling::Float64
+end
+
+function parse_parameter_file(path::AbstractString)
+    parameters = Dict{String, String}()
+
     for raw_line in eachline(path)
         line = strip(raw_line)
         isempty(line) && continue
         startswith(line, "#") && continue
+        occursin("=", line) || throw(ArgumentError("Invalid parameter line: $(raw_line)"))
 
-        if occursin("=", line)
-            key, value = strip.(split(line, "=", limit = 2))
-            key == "L" || continue
-            return parse(Int, value)
-        end
-
-        return parse(Int, line)
+        key, value = strip.(split(line, "=", limit = 2))
+        parameters[key] = value
     end
 
-    error("Could not find lattice size L in $(path).")
+    return parameters
+end
+
+function read_parameters(path::AbstractString)
+    parameters = parse_parameter_file(path)
+    haskey(parameters, "L") || error("Could not find lattice size L in $(path).")
+    haskey(parameters, "T") || error("Could not find temperature T in $(path).")
+    haskey(parameters, "J") || error("Could not find coupling J in $(path).")
+
+    return SimulationParameters(
+        parse(Int, parameters["L"]),
+        parse(Float64, parameters["T"]),
+        parse(Float64, parameters["J"]),
+    )
+end
+
+function read_lattice_size(path::AbstractString)
+    return read_parameters(path).L
 end
 
 function generate_lattice(L::Integer; rng::AbstractRNG = Random.default_rng())

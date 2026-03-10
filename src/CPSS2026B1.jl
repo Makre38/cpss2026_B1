@@ -9,6 +9,8 @@ export AbstractBoundaryCondition,
     generate_lattice_from_file,
     local_field,
     energy_change_for_flip,
+    metropolis_step!,
+    metropolis_sweep!,
     magnetization,
     energy
 
@@ -81,6 +83,46 @@ function energy_change_for_flip(
 )
     spin = lattice[row, col]
     return 2 * J * spin * local_field(lattice, row, col; boundary = boundary)
+end
+
+function metropolis_step!(
+    lattice::AbstractMatrix{<:Integer};
+    β::Real,
+    J::Real = 1,
+    boundary::AbstractBoundaryCondition = PeriodicBoundary(),
+    rng::AbstractRNG = Random.default_rng(),
+)
+    nrows, ncols = size(lattice)
+    nrows == ncols || throw(ArgumentError("lattice must be square."))
+
+    row = rand(rng, 1:nrows)
+    col = rand(rng, 1:ncols)
+    ΔE = energy_change_for_flip(lattice, row, col; J = J, boundary = boundary)
+
+    accepted = ΔE <= 0 || rand(rng) < exp(-β * ΔE)
+    if accepted
+        lattice[row, col] = -lattice[row, col]
+    end
+
+    return accepted, row, col, ΔE
+end
+
+function metropolis_sweep!(
+    lattice::AbstractMatrix{<:Integer};
+    β::Real,
+    J::Real = 1,
+    boundary::AbstractBoundaryCondition = PeriodicBoundary(),
+    rng::AbstractRNG = Random.default_rng(),
+)
+    accepted = 0
+    trials = length(lattice)
+
+    for _ in 1:trials
+        move_accepted, _, _, _ = metropolis_step!(lattice; β = β, J = J, boundary = boundary, rng = rng)
+        accepted += move_accepted
+    end
+
+    return accepted
 end
 
 function energy(lattice::AbstractMatrix{<:Integer}; J::Real = 1, boundary::AbstractBoundaryCondition = PeriodicBoundary())

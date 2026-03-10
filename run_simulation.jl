@@ -20,6 +20,23 @@ function main()
     println("Initial observables:")
     println("  magnetization = ", magnetization(lattice))
     println("  energy = ", energy(lattice; J = params.coupling))
+
+    println()
+    println("Thermalization:")
+    for sweep in 1:params.n_therm
+        accepted = metropolis_sweep!(lattice; β = beta, J = params.coupling)
+        println("  sweep ", sweep, ": accepted = ", accepted)
+    end
+
+    println()
+    println("Measurements:")
+    println("sweep,accepted,magnetization,energy")
+    for sweep in 1:params.n_measure
+        accepted = metropolis_sweep!(lattice; β = beta, J = params.coupling)
+        m = magnetization(lattice)
+        e = energy(lattice; J = params.coupling)
+        println(sweep, ",", accepted, ",", m, ",", e)
+    end
 end
 
 main()

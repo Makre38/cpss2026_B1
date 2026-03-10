@@ -1,7 +1,5 @@
 module CPSS2026Ising
 
-using Random
-
 export AbstractBoundaryCondition,
     PeriodicBoundary,
     SimulationParameters,
@@ -66,13 +64,13 @@ function read_lattice_size(path::AbstractString)
     return read_parameters(path).L
 end
 
-function generate_lattice(L::Integer; rng::AbstractRNG = Random.default_rng())
+function generate_lattice(L::Integer; rng = nothing)
     L > 0 || throw(ArgumentError("L must be positive."))
     spins = Int8[-1, 1]
-    return rand(rng, spins, L, L)
+    return isnothing(rng) ? rand(spins, L, L) : rand(rng, spins, L, L)
 end
 
-function generate_lattice_from_file(path::AbstractString; rng::AbstractRNG = Random.default_rng())
+function generate_lattice_from_file(path::AbstractString; rng = nothing)
     L = read_lattice_size(path)
     return generate_lattice(L; rng = rng)
 end
@@ -120,16 +118,17 @@ function metropolis_step!(
     β::Real,
     J::Real = 1,
     boundary::AbstractBoundaryCondition = PeriodicBoundary(),
-    rng::AbstractRNG = Random.default_rng(),
+    rng = nothing,
 )
     nrows, ncols = size(lattice)
     nrows == ncols || throw(ArgumentError("lattice must be square."))
 
-    row = rand(rng, 1:nrows)
-    col = rand(rng, 1:ncols)
+    row = isnothing(rng) ? rand(1:nrows) : rand(rng, 1:nrows)
+    col = isnothing(rng) ? rand(1:ncols) : rand(rng, 1:ncols)
     ΔE = energy_change_for_flip(lattice, row, col; J = J, boundary = boundary)
 
-    accepted = ΔE <= 0 || rand(rng) < exp(-β * ΔE)
+    threshold = isnothing(rng) ? rand() : rand(rng)
+    accepted = ΔE <= 0 || threshold < exp(-β * ΔE)
     if accepted
         lattice[row, col] = -lattice[row, col]
     end
@@ -142,7 +141,7 @@ function metropolis_sweep!(
     β::Real,
     J::Real = 1,
     boundary::AbstractBoundaryCondition = PeriodicBoundary(),
-    rng::AbstractRNG = Random.default_rng(),
+    rng = nothing,
 )
     accepted = 0
     trials = length(lattice)

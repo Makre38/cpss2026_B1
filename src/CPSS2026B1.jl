@@ -24,6 +24,8 @@ struct SimulationParameters
     L::Int
     temperature::Float64
     coupling::Float64
+    n_therm::Int
+    n_measure::Int
 end
 
 function parse_parameter_file(path::AbstractString)
@@ -47,11 +49,15 @@ function read_parameters(path::AbstractString)
     haskey(parameters, "L") || error("Could not find lattice size L in $(path).")
     haskey(parameters, "T") || error("Could not find temperature T in $(path).")
     haskey(parameters, "J") || error("Could not find coupling J in $(path).")
+    haskey(parameters, "n_therm") || error("Could not find n_therm in $(path).")
+    haskey(parameters, "n_measure") || error("Could not find n_measure in $(path).")
 
     return SimulationParameters(
         parse(Int, parameters["L"]),
         parse(Float64, parameters["T"]),
         parse(Float64, parameters["J"]),
+        parse(Int, parameters["n_therm"]),
+        parse(Int, parameters["n_measure"]),
     )
 end
 

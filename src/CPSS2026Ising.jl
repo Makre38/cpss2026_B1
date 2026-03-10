@@ -1,4 +1,4 @@
-module CPSS2026B1
+module CPSS2026Ising
 
 using Random
 

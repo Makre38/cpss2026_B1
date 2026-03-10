@@ -1,5 +1,5 @@
 set terminal gif animate delay 8 size 640,640
-set output "output/ising.gif"
+set output "../output/ising.gif"
 
 unset key
 unset colorbox
@@ -14,7 +14,7 @@ set tmargin at screen 0.90
 set cbrange [-1:1]
 set palette defined (-1 "#4169E1", 0 "#FFFFFF", 1 "#FF6347")
 
-files = system("find output/snapshots -name 'sweep_*.dat' | sort")
+files = system("find ../output/snapshots -name 'sweep_*.dat' | sort")
 nfiles = words(files)
 
 do for [i=1:nfiles] {

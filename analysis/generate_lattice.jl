@@ -1,12 +1,10 @@
-include("src/CPSS2026B1.jl")
+include(joinpath(@__DIR__, "..", "src", "CPSS2026Ising.jl"))
 
-using .CPSS2026B1
+using .CPSS2026Ising
 
-const PARAMS_FILE = "params.dat"
+const PARAMS_FILE = joinpath(@__DIR__, "params.dat")
 
 params = read_parameters(PARAMS_FILE)
-beta = 1 / params.temperature
-
 lattice = generate_lattice(params.L)
 
 println("L = ", params.L)
@@ -18,8 +16,3 @@ for row in eachrow(lattice)
 end
 println("magnetization = ", magnetization(lattice))
 println("energy = ", energy(lattice; J = params.coupling))
-
-accepted = metropolis_sweep!(lattice; β = beta, J = params.coupling)
-println("accepted flips = ", accepted)
-println("updated magnetization = ", magnetization(lattice))
-println("updated energy = ", energy(lattice; J = params.coupling))

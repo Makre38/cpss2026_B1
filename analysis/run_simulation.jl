@@ -1,9 +1,9 @@
-include("src/CPSS2026B1.jl")
+include(joinpath(@__DIR__, "..", "src", "CPSS2026Ising.jl"))
 
-using .CPSS2026B1
+using .CPSS2026Ising
 
-const PARAMS_FILE = "params.dat"
-const OUTPUT_DIR = "output"
+const PARAMS_FILE = joinpath(@__DIR__, "params.dat")
+const OUTPUT_DIR = joinpath(@__DIR__, "..", "output")
 const SNAPSHOT_DIR = joinpath(OUTPUT_DIR, "snapshots")
 const OBSERVABLES_FILE = joinpath(OUTPUT_DIR, "observables.dat")
 

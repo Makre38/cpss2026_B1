@@ -3,3 +3,4 @@ T = 2.5
 J = 1.0
 n_therm = 100
 n_measure = 1000
+snapshot_interval = 10

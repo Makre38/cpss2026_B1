@@ -41,6 +41,7 @@ function main()
     println("  J = ", params.coupling)
     println("  n_therm = ", params.n_therm)
     println("  n_measure = ", params.n_measure)
+    println("  snapshot_interval = ", params.snapshot_interval)
     println()
     println("Initial observables:")
     println("  magnetization = ", magnetization(lattice))
@@ -61,7 +62,9 @@ function main()
         m = magnetization(lattice)
         e = energy(lattice; J = params.coupling)
         append_observable(OBSERVABLES_FILE, sweep, accepted, m, e)
-        write_lattice_snapshot(joinpath(SNAPSHOT_DIR, "sweep_" * lpad(string(sweep), 4, '0') * ".dat"), lattice)
+        if sweep % params.snapshot_interval == 0
+            write_lattice_snapshot(joinpath(SNAPSHOT_DIR, "sweep_" * lpad(string(sweep), 4, '0') * ".dat"), lattice)
+        end
     end
 
     println("  observables written to ", OBSERVABLES_FILE)

@@ -11,3 +11,5 @@ println("lattice =")
 for row in eachrow(lattice)
     println(join(row, " "))
 end
+println("magnetization = ", magnetization(lattice))
+println("energy = ", energy(lattice))

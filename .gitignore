@@ -1,0 +1,27 @@
+# Julia
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+
+# Package and environment artifacts
+deps/deps.jl
+Manifest.toml
+
+# Build outputs
+build/
+dist/
+
+# Documentation and coverage
+docs/build/
+coverage/
+*.info
+lcov.info
+
+# Pluto / notebook state
+.pluto/
+
+# Editors and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
